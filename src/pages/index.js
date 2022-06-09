@@ -88,7 +88,7 @@ const links = [
     color: "#E95800",
   },
   {
-    text: "How to Guides",
+    text: "How to Guide",
     url: "https://www.gatsbyjs.com/docs/how-to/",
     description:
       "Practical step-by-step guides to help you achieve a specific goal. Most useful when you're trying to get something done.",
