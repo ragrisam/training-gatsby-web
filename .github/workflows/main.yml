@@ -31,6 +31,22 @@ jobs:
       - name: Verify the Public Folder
         run: ls -la public
 
+      - name: Upload public folder as Package
+        uses: actions/upload-artifact@v3
+        with:
+          name: public-package
+          path: public  
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: security-component-analysis
+    steps:
+      - name: Download the public folder to deploy Job
+        uses: actions/download-artifact@v3
+        with:
+          name: public-package
+          path: public
+
       - name: Copy the Public Folder to Ubuntu
         uses: marcodallasanta/ssh-scp-deploy@v1.2.0
         with:
@@ -42,4 +58,25 @@ jobs:
           ssh_options: -o StrictHostKeyChecking=no
           pre_upload: sudo rm -rf /var/www/html/*
           #post_upload: ls -la ~/public
-          post_upload: sudo mv ~/public/* /var/www/html/     
+          post_upload: sudo mv ~/public/* /var/www/html/
+
+  security-component-analysis:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout the Repo
+        uses: actions/checkout@v3
+
+      - name: Security Component Scanning
+        run: npm audit --json > npm-audit-result.json
+        continue-on-error: true
+
+      - name: List the Files available
+        run: ls -la
+
+      - name: Archive the NPM Audit Results Output JSON file
+        uses: actions/upload-artifact@v3
+        with:
+          name: NPM Audit Output JSON File
+          path: npm-audit-result.json
+        if: always()
